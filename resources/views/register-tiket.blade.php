@@ -6,7 +6,8 @@
 </head>
 <body class="bg-gray-900 text-white flex items-center justify-center h-screen">
     <div class="bg-gray-800 p-8 rounded-lg shadow-xl w-96">
-        <h2 class="text-2xl font-bold mb-6 text-center text-orange-500">Pendaftaran Tiket</h2>
+        <h2 class="text-2xl font-bold mb-2 text-center text-orange-500">Pendaftaran Tiket</h2>
+<p class="text-sm text-gray-400 text-center mb-6 font-semibold">{{ $nama_event ?? 'FESTA BTS 2026' }}</p>
         
         @if(session('success'))
             <div class="bg-green-500 p-3 rounded mb-4 text-sm">
@@ -31,15 +32,30 @@
 @else
         <form action="{{ route('tiket.simpan') }}" method="POST">
             @csrf
+            
             <div class="mb-4">
-                <label class="block text-sm mb-2">Nama Lengkap</label>
-                <input type="text" name="name" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:border-orange-500 outline-none" required>
+                <label class="block text-sm mb-2 text-gray-300">Nama Lengkap</label>
+                <input type="text" name="name" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:border-orange-500 outline-none text-white" required placeholder="Masukkan nama lengkap">
             </div>
-            <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 p-2 rounded font-bold transition">
+
+            <div class="mb-4">
+                <label class="block text-sm mb-2 text-gray-300">Nomor WhatsApp</label>
+                <input type="number" name="whatsapp" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:border-orange-500 outline-none text-white" required placeholder="Contoh: 08123456789">
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-sm mb-2 text-gray-300">Jumlah Tiket (Maks. 2 Tiket)</label>
+                <select name="jumlah_tiket" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:border-orange-500 outline-none text-white" required>
+                    <option value="1">1 Tiket</option>
+                    <option value="2">2 Tiket</option>
+                </select>
+            </div>
+
+            <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 p-2 rounded font-bold transition text-white">
                 Dapatkan Tiket
             </button>
         </form>
-@endif
+    @endif
 
     </div>
 </body>
