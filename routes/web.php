@@ -5,6 +5,7 @@ use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Barryvdh\DomPDF\Facade\Pdf;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 // 1. Halaman Depan: Pilihan Banyak Event
 Route::get('/', function () {
@@ -27,25 +28,11 @@ Route::get('/register/{event}', function ($event) {
 // 3. Route buat proses simpan data dari form pendaftaran
 Route::post('/tiket-simpan', [App\Http\Controllers\Api\TicketController::class, 'simpan'])->name('tiket.simpan');
 
-Route::post('/register', function (Request $request) {
-    // 1. Validasi biar gak ada nama kosong
-    $request->validate(['name' => 'required|min:3']);
+Route::get('/register', function () {
+    return redirect('/');
+});
 
-    // 2. Bikin kode unik otomatis (Contoh: TITI-XXXX)
-    $kodeUnik = 'EVT-' . strtoupper(Str::random(5));
-
-    // 3. Masukin ke database
-    Ticket::create([
-        'name' => $request->name,
-        'qr_code' => $kodeUnik,
-        'is_checked_in' => false,
-    ]);
-
-    // Cari bagian return di route POST /register tadi, ganti jadi:
-    return view('register-tiket', ['kode' => $kodeUnik]);
-    })->name('tiket.simpan');
-
-    Route::get('/download-tiket/{kode}', function ($kode) {
+Route::get('/download-tiket/{kode}', function ($kode) {
     // Cari data tiket di database berdasarkan kode QR
     $ticket = App\Models\Ticket::where('qr_code', $kode)->firstOrFail();
 

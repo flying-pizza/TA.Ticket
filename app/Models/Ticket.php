@@ -9,8 +9,13 @@ class Ticket extends Model
 {
     protected $fillable = [
         'name',
+        'whatsapp',
+        'kategori',
+        'jumlah_tiket',
         'qr_code',
         'is_checked_in',
+        'metode_pembayaran',
+        'status_pembayaran',
     ];
 
     protected static function booted()

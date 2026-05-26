@@ -13,6 +13,9 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 
 class TicketResource extends Resource
 {
@@ -24,10 +27,35 @@ class TicketResource extends Resource
     {
         return $schema
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->label('Nama')
-                    ->required(),
-                Forms\Components\Hidden::make('qr_code'),
+                // 1. Kolom Nama
+            Forms\Components\TextInput::make('name')
+                ->required()
+                ->maxLength(255),
+
+            // 2. Kolom WhatsApp (Tambahan Baru)
+            Forms\Components\TextInput::make('whatsapp')
+                ->label('Nomor WhatsApp')
+                ->required(),
+
+            // 3. Kolom Kategori Tiket (Tambahan Baru)
+            Forms\Components\Select::make('kategori')
+                ->options([
+                    'VIP (Free Merchandise)' => '👑 VIP (Free Merchandise)',
+                    'CAT 1' => '🎟️ CAT 1',
+                    'CAT 2' => '🎟️ CAT 2',
+                ])
+                ->required(),
+
+            // 4. Kolom Jumlah Tiket (Tambahan Baru)
+            Forms\Components\TextInput::make('jumlah_tiket')
+                ->numeric()
+                ->default(1)
+                ->required(),
+                
+            // 5. Kolom Status Kehadiran
+            Forms\Components\Toggle::make('is_checked_in')
+                ->label('Sudah Hadir')
+                ->required(),
             ]);
     }
 
@@ -39,10 +67,40 @@ class TicketResource extends Resource
             ->searchable(),
         Tables\Columns\TextColumn::make('qr_code')
             ->label('Kode QR'),
+        Tables\Columns\TextColumn::make('whatsapp')
+                ->label('No. WhatsApp')
+                ->searchable(),
+        Tables\Columns\TextColumn::make('kategori')
+                ->label('Kategori')
+                ->badge()
+                ->color(fn (string $state): string => match ($state) {
+                    'VIP (Free Merchandise)' => 'purple',
+                    'CAT 1' => 'info',
+                    default => 'gray',
+                }),
+        Tables\Columns\TextColumn::make('jumlah_tiket')
+                ->label('Jumlah')
+                ->alignCenter(),
+        Tables\Columns\ImageColumn::make('qr_code')
+                ->label('QR Cadangan')
+                ->defaultImageUrl(fn ($record) => 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' . $record->qr_code)
+                ->circular(),
         Tables\Columns\IconColumn::make('is_checked_in')
-            ->label('Sudah Hadir?')
-            ->boolean(),
-    ]);
+                ->label('Sudah Hadir?')
+                ->boolean(),
+        ])
+
+        ->filters([ 
+            //
+        ])
+        ->actions([
+            EditAction::make(),
+        ])
+        ->bulkActions([
+            BulkActionGroup::make([
+                DeleteBulkAction::make(),
+            ]),
+        ]);
 }
 
     public static function getRelations(): array
@@ -60,4 +118,5 @@ class TicketResource extends Resource
             'edit' => EditTicket::route('/{record}/edit'),
         ];
     }
+
 }
